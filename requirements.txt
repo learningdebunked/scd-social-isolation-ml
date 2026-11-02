@@ -1,0 +1,34 @@
+# Core data science
+pandas==2.1.4
+numpy==1.26.3
+scipy==1.12.0
+scikit-learn==1.4.0
+pyarrow==14.0.2        # parquet read/write
+
+# Machine learning
+xgboost==2.0.3
+optuna==3.5.0          # Bayesian hyperparameter tuning
+lightgbm==4.3.0        # baseline comparison (optional)
+
+# Interpretability
+shap==0.44.1
+
+# Survey statistics
+statsmodels==0.14.1    # logistic regression, Hosmer-Lemeshow
+pingouin==0.5.4        # effect sizes, heterogeneity tests
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.2
+
+# Notebook
+jupyter==1.0.0
+ipykernel==6.29.0
+
+# Data I/O
+sas7bdat==2.2.3        # SAS XPT parsing (fallback)
+
+# Utilities
+tqdm==4.66.1
+pyyaml==6.0.1
+loguru==0.7.2

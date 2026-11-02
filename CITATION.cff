@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Social Isolation and SCD in BRFSS 2023-2024: Interpretable ML Screening"
+abstract: >
+  XGBoost + SHAP machine learning pipeline for subjective cognitive decline
+  screening in U.S. adults aged 50+, using BRFSS 2023-2024 (N=192,567).
+  Includes the Modifiable Social Isolation Index (MSII) construction.
+authors:
+  - family-names: "[FAMILY NAME]"
+    given-names: "[GIVEN NAME]"
+    affiliation: "[INSTITUTION]"
+    orcid: "https://orcid.org/[ORCID]"
+version: "1.0.0"
+date-released: "[YYYY-MM-DD]"
+license: MIT
+repository-code: "https://github.com/[USERNAME]/social-isolation-scd-brfss"
+doi: "[DOI — to be assigned upon acceptance]"
+keywords:
+  - machine learning
+  - XGBoost
+  - SHAP
+  - subjective cognitive decline
+  - social isolation
+  - BRFSS
+  - public health surveillance
+  - interpretable AI
+  - aging
+  - United States
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "[FAMILY NAME]"
+      given-names: "[GIVEN NAME]"
+      affiliation: "[INSTITUTION]"
+  title: >
+    Social Isolation and Subjective Cognitive Decline in 192,567 U.S. Adults
+    Aged 50+: An Interpretable Machine Learning Screening Study Using
+    BRFSS 2023-2024
+  journal: "JMIR AI"
+  issn: "2817-1705"
+  year: "[YEAR]"
+  doi: "[DOI — to be assigned upon acceptance]"
