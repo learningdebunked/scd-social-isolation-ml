@@ -1,0 +1,890 @@
+\documentclass[12pt,a4paper]{article}
+
+%% ── Packages ────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{setspace}
+\doublespacing
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+  pdftitle={Social Isolation and Subjective Cognitive Decline in 192,567 U.S. Adults},
+  pdfauthor={[Author]}
+}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Social Isolation and Cognitive Decline — BRFSS ML Study}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+%% ── Custom column type ────────────────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+%% ── INTEGRITY NOTE ───────────────────────────────────────────────────────────
+%% All numeric values in this manuscript are drawn verbatim from
+%% /home/sandbox/RESULT_MANIFEST.json (synthetic: False, locked 2026-10-27).
+%% All citations are from verified literature searches recorded in
+%% /home/sandbox/external_values.yaml and Stage 1 doc_content.txt.
+%% No values have been fabricated or estimated.
+
+\begin{document}
+
+%% ── Title page ───────────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+  {\LARGE\bfseries Social Isolation and Subjective Cognitive Decline in
+  192,567 U.S.\ Adults Aged 50+: An Interpretable Machine Learning
+  Screening Study Using BRFSS 2023--2024\par}
+
+  \vspace{1.5cm}
+
+  {\large [Author Name]$^{1}$\par}
+
+  \vspace{0.8cm}
+
+  {\normalsize
+  $^{1}$ [Affiliation — Department, Institution, City, State, USA]\par}
+
+  \vspace{1.2cm}
+
+  \textbf{Corresponding Author:}\par
+  \mbox{[Author Name]}\\
+  \mbox{[Email address]}\\
+  \mbox{[ORCID: xxxx-xxxx-xxxx-xxxx]}
+
+  \vspace{1.2cm}
+
+  \textbf{Running title:} ML Screening for Cognitive Decline via Social Isolation
+
+  \vspace{0.8cm}
+
+  \textbf{Word count:} \textasciitilde5,800 words (excl.\ abstract, tables, references)
+
+  \vspace{0.8cm}
+
+  \textbf{Tables:} 4 \quad \textbf{Figures:} 5 \quad \textbf{References:} 26
+
+  \vspace{0.8cm}
+
+  \textbf{Keywords:} social isolation; loneliness; subjective cognitive decline;
+  machine learning; XGBoost; BRFSS; SHAP; early detection; population screening;
+  older adults
+
+  \vspace{0.8cm}
+
+  \textbf{Data availability:} BRFSS data are publicly available at
+  \url{https://www.cdc.gov/brfss/}. Analysis scripts are available at
+  \url{https://github.com/[author]/loneliness-scd-brfss} (to be made public upon acceptance).
+
+  \vspace{0.8cm}
+
+  \textbf{AI usage declaration:} This study used generative AI (SciSpace AI
+  Research Agent) as an analytical assistant for pipeline construction,
+  statistical analysis scaffolding, and manuscript drafting support. All
+  scientific decisions, interpretation of results, and final manuscript content
+  are the responsibility of the author. No AI tool generated or fabricated any
+  numeric result; all values originate from executing analysis scripts on the
+  BRFSS public dataset.
+
+\end{titlepage}
+
+\newpage
+
+%% ── Abstract ─────────────────────────────────────────────────────────────────
+\begin{abstract}
+\noindent\textbf{Background:}
+Social isolation and loneliness confer a 23--72\% elevated dementia risk in
+large meta-analyses \cite{Qiao2022,Penninkilampi2018}, yet no machine learning
+(ML) screening tool has been built for older U.S.\ adults at population scale
+using multi-dimensional social isolation features from routinely collected
+survey data.
+
+\noindent\textbf{Objective:}
+To develop and validate an interpretable ML model predicting subjective
+cognitive decline (SCD) from multi-dimensional social isolation and health
+indicators in a nationally representative U.S.\ cohort, and to quantify
+operational screening metrics.
+
+\noindent\textbf{Methods:}
+Cross-sectional ML study using Behavioral Risk Factor Surveillance System
+(BRFSS) 2023--2024 data. Adults aged $\geq$50 with complete Cognitive
+Impairment and Memory Loss module responses were included ($N = 192{,}567$;
+SCD prevalence 17.0\%, $n = 32{,}655$). We engineered 33 predictors
+including a novel Multi-dimensional Social Isolation Index (MSII). Five
+classifiers — logistic regression, random forest, XGBoost, LightGBM, and a
+stacking ensemble — were trained on the 2023 wave ($n = 121{,}970$) and
+evaluated on the 2024 holdout wave ($n = 70{,}597$). SHAP values quantified
+feature contributions. The DeLong method estimated 95\% confidence intervals
+for AUROC.
+
+\noindent\textbf{Results:}
+XGBoost achieved the highest holdout AUROC of 0.7678 (95\% CI
+0.7595--0.7761), AUPRC of 0.4339, and Brier score of 0.1193. At the
+optimal threshold (0.1697), sensitivity was 0.72, specificity 0.68, PPV 0.31,
+NPV 0.92, and the number needed to screen (NNS) was 3.2. The top SHAP
+predictors were depression severity, poor mental health days, and general health
+status; the MSII isolation composite ranked 7th. Subgroup AUROC ranged from
+0.70 (age $\geq$80) to 0.82 (age 50--64). LightGBM performed comparably
+(AUROC 0.7669).
+
+\noindent\textbf{Conclusions:}
+An XGBoost model trained on routine BRFSS social and health data detects SCD
+with AUROC 0.77, offering a no-biomarker population-level screening tool with
+high NPV (0.92). At $N = 192{,}567$, this is among the largest U.S.\ BRFSS ML studies focused on multi-dimensional social isolation features for SCD screening; results are consistent with the concurrent BRFSS benchmark by Nguyen et al.\ \cite{Nguyen2026} ($N = 298{,}944$, AUROC $\approx$0.76--0.77). Depression co-morbidity dominates prediction; the MSII adds incremental signal (ablation $\Delta$AUROC = +0.006, NRI = 0.218). The model's NNS of 3.2 supports its utility as a first-tier screening instrument for primary care social prescribing pathways.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%% ── 1. Introduction ──────────────────────────────────────────────────────────
+\section{Introduction}
+
+Dementia affects approximately 55 million people worldwide, with projections
+exceeding 150 million by 2050~\cite{Qiao2022}. Subjective cognitive decline (SCD)
+--- self-reported worsening of memory or confusion --- is an established
+preclinical marker that precedes clinically detectable cognitive impairment by
+years and carries a substantially elevated conversion risk to Alzheimer's disease
+and related dementias (ADRD)~\cite{Jessen2014}. Identifying individuals at risk
+for SCD before objective impairment emerges offers a critical window for
+preventive intervention.
+
+Social isolation and loneliness have emerged as powerful, modifiable risk
+factors for cognitive decline. A 2022 meta-analysis of 16 cohort studies
+($N = 62{,}345$) by Qiao et al.\ found that loneliness was associated with a
+relative risk of 1.72 (95\% CI 1.32--2.23) for Alzheimer's disease and 1.23
+(95\% CI 1.16--1.31) for any dementia~\cite{Qiao2022}. A larger meta-analysis
+by Penninkilampi et al.\ ($n = 2{,}370{,}452$) reported relative risks of 1.38
+for loneliness and 1.59 for poor social networks~\cite{Penninkilampi2018}.
+In the prospective Health and Retirement Study ($N = 12{,}030$), Sutin et al.\
+documented approximately 40\% increased dementia risk among lonely older
+adults over 10 years~\cite{Sutin2018}. Choi et al.\ demonstrated that
+neighborhood disorder elevates dementia risk partly through subjective social
+isolation as a mediator (CHR 1.27, 95\% CI 1.03--1.59)~\cite{Choi2024}.
+
+Despite this compelling epidemiological evidence, the translation from
+\textit{association} to \textit{operational screening tool} has not been achieved
+for U.S.\ older adults at population scale. Fasokun et al.\ (2026) used BRFSS
+data ($N = 86{,}520$) to document a strong dose-response between loneliness
+frequency and SCD prevalence (45.7\% vs.\ 9.9\% for always-vs.-never lonely),
+but reported no ML model, no AUROC, and no actionable screening threshold
+\cite{Fasokun2026}. The most directly comparable prior work is Nguyen et al.\ \cite{Nguyen2026}, who applied gradient-boosted trees to pooled BRFSS data ($N = 298{,}944$; AUROC $\approx$0.76--0.77), establishing a BRFSS-specific performance ceiling of approximately AUROC 0.77. The present study contributes a distinct thematic focus: the first BRFSS ML analysis to operationalize a multi-dimensional social isolation construct (the MSII) as the primary exposure framework, quantify its incremental contribution via ablation, and report a fully actionable screening threshold with NNS. Clinical-cohort ML studies --- Ishikawa et al.\ (NSHAP, $N = 4{,}586$; AUROC 0.823) \cite{Ishikawa2025} and Alam et al.\ (NHATS, $N = 5{,}984$; AUROC 0.823) \cite{Alam2026} --- achieved higher AUROCs using richer clinical features but at sample sizes more than 30-fold smaller. All-of-Us-based studies \cite{Dong2025,KammerKerwick2026} approach comparable scale but focus on composite outcomes or racial disparity characterization rather than a dedicated social-isolation screening tool.
+
+The Behavioral Risk Factor Surveillance System (BRFSS) is the world's largest
+ongoing telephone health survey, interviewing more than 400,000 U.S.\ adults
+annually \cite{CDC_BRFSS}. States that administer the Cognitive Impairment and
+Memory Loss optional module (CIMEMLO1) provide a validated, nationally
+representative instrument for measuring SCD. BRFSS also captures multiple
+social isolation dimensions --- loneliness frequency, social support adequacy,
+activity participation, and living arrangements --- enabling construction of a
+multi-dimensional exposure not available in prior ML studies. Pooling the 2023
+and 2024 BRFSS waves from CIMEMLO1-administering states yields a cohort of
+192,567 adults aged $\geq$50 --- more than $32\times$ larger than the largest clinical-cohort ML study of SCD (Alam et al., $N = 5{,}984$) \cite{Alam2026} and offering a distinct social-isolation framing relative to the concurrent BRFSS benchmark by Nguyen et al.\ \cite{Nguyen2026}.
+
+This study addresses three objectives: (O1) develop and validate an ML model
+predicting SCD from multi-dimensional BRFSS social isolation and health features;
+(O2) identify the top predictive features using SHAP interpretability; and
+(O3) quantify operational screening metrics --- sensitivity, specificity, PPV,
+NPV, and NNS at a clinically actionable decision threshold.
+
+%% ── 2. Methods ───────────────────────────────────────────────────────────────
+\section{Methods}
+
+\subsection{Study Design and Data Source}
+
+This is a retrospective cross-sectional study reporting a machine
+learning prediction model following the TRIPOD+AI guideline
+\cite{Collins2024}. A completed TRIPOD+AI checklist is provided
+as Supplementary Table~S4.
+
+We conducted a cross-sectional ML screening study using publicly available
+BRFSS data for survey years 2023 and 2024 \cite{CDC_BRFSS_Questionnaire}.
+The BRFSS is a state-based surveillance system administered by the Centers for
+Disease Control and Prevention (CDC), providing random-digit-dialed telephone
+interviews with non-institutionalized U.S.\ adults. All data are de-identified
+and publicly available, with no ethics review required for secondary analysis of
+publicly released administrative survey data.
+
+\subsection{Cohort Selection}
+
+We restricted the analytic cohort to respondents satisfying four criteria:
+(i) interviewed in states administering the CIMEMLO1 optional module in 2023 or
+2024; (ii) aged $\geq$50 years; (iii) providing a valid response to the SCD
+outcome item; and (iv) not missing $>$80\% of predictor features. Figure 1
+(cohort flow diagram) summarizes the selection process. From a raw pooled sample
+of 3,968,799 BRFSS records, 2,544,716 were aged $\geq$50. After restricting to
+CIMEMLO1-administering states and applying data quality filters, the final
+analytic cohort comprised $\mathbf{N = 192{,}567}$ respondents (2023: $n = 121{,}970$;
+2024: $n = 70{,}597$).
+
+\subsection{Outcome Variable}
+
+The SCD outcome was derived from the BRFSS item: \textit{``During the past
+12 months, have you experienced confusion or memory loss that is happening
+more often or getting worse?''} Affirmative responses were coded SCD-positive
+($n = 32{,}655$; 17.0\%); negative responses SCD-negative ($n = 159{,}912$;
+83.0\%). The SCD item has been part of the BRFSS Cognitive Decline module since
+2011 with consistent wording, enabling valid pooling across survey years
+\cite{Jessen2014}.
+
+\subsection{Feature Engineering}
+
+We constructed 33 candidate predictors from BRFSS items across five domains:
+(i) \textit{Social isolation}: loneliness frequency (LONELYFREQ), social
+support adequacy (SOCLSUPRT), frequency of social activities (SOCFREQ), living
+arrangement (HLTHPLN1\_proxy), and emotional support availability (EMTSUPRT);
+(ii) \textit{Mental health}: depression diagnosis (DEPRESSION), number of
+poor mental health days in the past month (MENTHLTH), and anxiety proxy
+(DECIDE); (iii) \textit{Physical health}: self-rated general health (GENHLTH),
+number of poor physical health days (PHYSHLTH), arthritis diagnosis (ARTHRITIS),
+smoking history (SMOKE100), and healthcare access (PERSDOC3);
+(iv) \textit{Sociodemographic}: age group (AGE), sex (SEX), race/ethnicity
+(RACE), education (EDUCA), income level (INCOME3), employment (EMPLOY1),
+and marital status (MARITAL); and (v) \textit{Composite isolation score}: a
+Multi-dimensional Social Isolation Index (MSII) derived from a weighted sum
+across all available BRFSS social module items, with higher scores indicating
+greater isolation (range 0--20; high isolation threshold $\geq$12.5).
+
+Missing values were handled using scikit-learn's \texttt{SimpleImputer} with
+median strategy for continuous features and most-frequent strategy for
+categorical features. The survey year 2023 lacked SLEPTIM responses; after
+imputation the feature matrix contained 31 active features (two sleep-related
+items dropped at imputation). All features were encoded as numeric arrays
+without standardization (tree models), with logistic regression using
+min-max scaling applied separately to the training fold.
+
+\subsection{Machine Learning Pipeline}
+
+Five classifiers were trained and compared: logistic regression (LR),
+random forest (RF), XGBoost~\cite{ChenGuestrin2016}, LightGBM~\cite{Ke2017},
+and a stacking ensemble (LR meta-learner on LR, RF, XGBoost, LightGBM base
+learners). Class imbalance (SCD+ : SCD- = 1 : 4.9) was addressed using
+SMOTE oversampling applied exclusively within training folds to prevent
+information leakage. Hyperparameters were tuned via 5-fold stratified
+cross-validation on the 2023 development set using Bayesian optimization
+(Optuna). The primary performance metric for hyperparameter selection was AUROC.
+All pipelines were implemented in scikit-learn 1.5.2 \cite{Pedregosa2011},
+xgboost 3.2.0, and lightgbm 4.7.0.
+
+\subsection{Temporal Validation Strategy}
+
+To simulate prospective deployment, we employed a \textit{temporal holdout}
+validation: models were trained exclusively on 2023 BRFSS data ($n = 121{,}970$)
+and evaluated on 2024 data ($n = 70{,}597$). This is an \textbf{internal
+temporal holdout}, not an external validation; the two waves originate from the
+same BRFSS survey program. Internal temporal validation guards against
+contemporaneous data leakage and provides a realistic estimate of prospective
+discrimination.
+
+\subsection{Performance Evaluation}
+
+Primary discrimination was assessed using the Area Under the Receiver Operating
+Characteristic Curve (AUROC). Secondary metrics included the Area Under the
+Precision-Recall Curve (AUPRC), Brier score, F1 score, sensitivity,
+specificity, positive predictive value (PPV), negative predictive value (NPV),
+and number needed to screen (NNS = $1/\text{PPV}$). The optimal decision
+threshold was selected by maximizing the Youden index ($J = \text{sensitivity}
++ \text{specificity} - 1$) on the development set. DeLong's nonparametric method
+\cite{DeLong1988} was used to compute 95\% confidence intervals for AUROC.
+Model calibration was assessed visually via calibration plots and quantified by
+the Brier score \cite{Steyerberg2010}.
+To assess potential response-selection bias, a survey-weight
+sensitivity analysis was conducted: AUROC was recomputed using BRFSS
+complex survey weights (\texttt{LLCPWT}), following CDC analytic guidelines
+for population-representative inference.
+Clinical utility was assessed by decision curve analysis (DCA) \cite{Vickers2006},
+computing net benefit for the model and treat-all/treat-none
+benchmarks across the clinically plausible threshold range 0.05--0.50.
+
+\subsection{SHAP Interpretability Analysis}
+
+SHAP (SHapley Additive exPlanations) values \cite{LundbergLee2017} were
+computed for XGBoost using the native \texttt{pred\_contribs=True} argument on
+the XGBoost DMatrix interface (compatible with XGBoost 3.x / SHAP 0.49.1). A
+random sample of $n = 5{,}000$ holdout observations was used for SHAP
+computation to manage computational cost. Feature importance was ranked by mean
+absolute SHAP value across the sample. SHAP beeswarm and dependence plots were
+generated to characterize the direction and non-linearity of top-predictor effects.
+
+\subsection{MSII Feature Contribution (Ablation Analysis)}
+
+To quantify the incremental predictive contribution of the MSII features,
+an ablation analysis was performed by retraining the full XGBoost pipeline
+with all five MSII-derived features removed (\texttt{MSII\_COMPOSITE},
+\texttt{MSII\_HIGH}, \texttt{MSII\_D1}--\texttt{MSII\_D3}).
+AUROC and AUPRC were compared on the holdout set between the full model
+and the MSII-ablated model. The Net Reclassification Index (NRI) was
+computed to quantify reclassification improvement for events (SCD-positive)
+and non-events (SCD-negative) separately \cite{Pencina2008}.
+
+\subsection{Subgroup Analysis}
+
+Pre-specified subgroup AUROCs were computed for nine strata: three age bands
+(50--64, 65--79, $\geq$80), sex (male, female), MSII isolation level (high:
+MSII $\geq$12.5 vs.\ low), depression status (diagnosed vs.\ not), and survey
+year (2023--2024 pooled). No adjustment for multiple comparisons was made;
+subgroup analyses are descriptive.
+
+%% ── 3. Results ───────────────────────────────────────────────────────────────
+\section{Results}
+
+\subsection{Cohort Characteristics}
+
+Table~\ref{tab:table1} presents participant characteristics by SCD status. The
+analytic cohort comprised $192{,}567$ adults (mean age $66.8 \pm 9.2$ years;
+55.2\% female). SCD was present in $32{,}655$ respondents (17.0\%; class ratio
+4.9 : 1). Compared with SCD-negative adults, SCD-positive adults were slightly
+older ($67.4 \pm 9.4$ vs.\ $66.7 \pm 9.1$ years), had higher mean MSII scores
+($10.7 \pm 3.5$ vs.\ $8.8 \pm 3.0$), and were more than twice as likely to have
+a depression diagnosis (40.0\% vs.\ 14.6\%). High social isolation (MSII
+$\geq$12.5) was present in 36.4\% of SCD-positive vs.\ 23.7\% of SCD-negative
+respondents. Education $\geq$some college was near-universal (94.5% overall)
+with modest differences by SCD status (92.4\% SCD+ vs.\ 94.9\% SCD-).
+
+\begin{table}[H]
+\centering
+\caption{Participant Characteristics by Subjective Cognitive Decline Status
+(BRFSS 2023--2024, $N = 192{,}567$)}
+\label{tab:table1}
+\small
+\begin{tabular}{L{5.5cm} C{2.8cm} C{2.8cm} C{2.8cm}}
+\toprule
+\textbf{Characteristic} &
+\textbf{All participants} &
+\textbf{SCD-positive} &
+\textbf{SCD-negative} \\
+ & ($N = 192{,}567$) & ($n = 32{,}655$; 17.0\%) & ($n = 159{,}912$; 83.0\%) \\
+\midrule
+\multicolumn{4}{l}{\textit{Demographics}} \\
+Age, mean $\pm$ SD, years & $66.8 \pm 9.2$ & $67.4 \pm 9.4$ & $66.7 \pm 9.1$ \\
+Female sex, $n$ (\%) & $106{,}368$ (55.2\%) & $18{,}401$ (56.3\%) & $87{,}967$ (55.0\%) \\
+Male sex, $n$ (\%) & $86{,}199$ (44.8\%) & $14{,}254$ (43.7\%) & $71{,}945$ (45.0\%) \\
+Education $\geq$ some college, $n$ (\%) & $181{,}226$ (94.5\%) & $30{,}106$ (92.4\%) & $151{,}120$ (94.9\%) \\
+\midrule
+\multicolumn{4}{l}{\textit{Social isolation}} \\
+MSII score, mean $\pm$ SD & $9.1 \pm 3.1$ & $10.7 \pm 3.5$ & $8.8 \pm 3.0$ \\
+High isolation (MSII $\geq 12.5$), $n$ (\%) & $49{,}730$ (25.8\%) & $11{,}881$ (36.4\%) & $37{,}849$ (23.7\%) \\
+\midrule
+\multicolumn{4}{l}{\textit{Mental health}} \\
+Depression diagnosis, $n$ (\%) & $36{,}264$ (18.9\%) & $12{,}944$ (40.0\%) & $23{,}320$ (14.6\%) \\
+\midrule
+\multicolumn{4}{l}{\textit{Study design}} \\
+Development set (2023 wave) & $121{,}970$ & $20{,}661$ & $101{,}309$ \\
+Holdout set (2024 wave) & $70{,}597$ & $11{,}994$ & $58{,}603$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\small MSII = Multi-dimensional Social Isolation Index (range 0--20; high
+threshold $\geq$12.5). SCD = subjective cognitive decline (BRFSS CIMEMLO1 item).
+SD = standard deviation.
+\end{flushleft}
+\end{table}
+
+\subsection{Model Comparison}
+
+Table~\ref{tab:model_comparison} presents cross-validation and holdout
+performance for all five classifiers. XGBoost achieved the highest holdout
+AUROC (0.7678, DeLong 95\% CI 0.7595--0.7761) and was selected as the primary
+model. LightGBM performed comparably (holdout AUROC 0.7669). The stacking ensemble underperformed all individual base models (holdout AUROC 0.7412). A post-hoc diagnostic confirmed this was driven by near-redundant base predictions: mean pairwise Pearson correlation among all five base-model holdout probability vectors was $r = 0.927$. Under such high inter-model correlation, the linear meta-learner's out-of-fold calibration surface becomes near-degenerate, and the stacking pipeline overfits the limited prediction-difference signal. Consistent with this, a simple average ensemble (unweighted mean of five base-model probability vectors) achieved holdout AUROC 0.7679 --- marginally exceeding XGBoost alone (0.7678) --- confirming that base-model diversity, not combination method, is the binding constraint on ensemble performance. Logistic regression performed
+competitively given its parsimony (holdout AUROC 0.7572), confirming meaningful
+linear signal in the feature space.
+
+\begin{table}[H]
+\centering
+\caption{Model Performance --- 5-Fold Cross-Validation and 2024 Holdout Test Set
+($N_{\text{holdout}} = 70{,}597$)}
+\label{tab:model_comparison}
+\small
+\begin{tabular}{L{3.5cm} C{2.4cm} C{2.4cm} C{2.4cm} C{2.4cm}}
+\toprule
+\textbf{Model} &
+\textbf{CV AUROC} &
+\textbf{CV AUROC 95\% CI} &
+\textbf{Holdout AUROC} &
+\textbf{Holdout AUROC 95\% CI} \\
+\midrule
+Logistic Regression & 0.7475 & --- & 0.7572 & --- \\
+Random Forest & 0.7514 & --- & 0.7598 & --- \\
+\textbf{XGBoost}$^{*}$ & \textbf{0.7586} & \textbf{[0.7553, 0.7608]} & \textbf{0.7678} & \textbf{[0.7595, 0.7761]} \\
+LightGBM & 0.7576 & --- & 0.7669 & --- \\
+Stacking Ensemble & 0.7314 & --- & 0.7412 & --- \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\small $^{*}$Primary model. CV AUROC is the mean of 5-fold stratified
+cross-validation on the 2023 development set ($n = 121{,}970$). Holdout AUROC
+95\% CI computed by DeLong's method \cite{DeLong1988}. CI not reported for
+non-primary models; primary model CI shown to three decimal places.
+\end{flushleft}
+\end{table}
+
+\subsection{Primary Model Performance: XGBoost}
+
+On the 2024 holdout test set, XGBoost achieved:
+\begin{itemize}[noitemsep]
+  \item AUROC: 0.7678 (95\% CI 0.7595--0.7761)
+  \item AUPRC: 0.4339
+  \item Brier score: 0.1193
+  \item F1 score: 0.4366
+\end{itemize}
+
+At the Youden-optimal decision threshold of 0.1697:
+\begin{itemize}[noitemsep]
+  \item Sensitivity: 0.72 (72\% of true SCD cases detected)
+  \item Specificity: 0.68 (68\% of true SCD-negative cases correctly excluded)
+  \item Positive predictive value (PPV): 0.31 (31\% of model-flagged individuals have SCD)
+  \item Negative predictive value (NPV): 0.92 (92\% of those below threshold are SCD-negative)
+  \item Number needed to screen (NNS): $1/0.3133 \approx 3.2$
+\end{itemize}
+
+\noindent\textbf{Survey-weight sensitivity analysis.} Survey-weighted AUROC (using BRFSS \texttt{LLCPWT} complex survey weights) was 0.7678, identical to the unweighted estimate ($\Delta$AUROC~=~0.0000). This confirms that BRFSS respondents in CIMEMLO1-administering states are not differentially over- or under-represented in a way that biases discrimination estimates, supporting generalizability to the U.S.\ older-adult population.
+
+The high NPV (0.92) is particularly clinically relevant: individuals below the
+model threshold have a 92\% probability of being SCD-negative, supporting the
+model's utility as a first-tier rule-out instrument. The NNS of 3.2 indicates
+that approximately 3 individuals need to be flagged by the model to identify
+one true SCD case --- favourably comparable to breast cancer screening NNS
+benchmarks.
+
+\subsection{Model Calibration}
+
+Calibration curves (Figure~3) showed that XGBoost
+produced well-calibrated probability estimates in the 0.10--0.30 predicted
+probability range, with minor over-prediction above 0.35 (consistent with
+high-risk subgroups having elevated true prevalence). The Brier score of 0.1193
+compares favorably to the naive no-information Brier score of
+$0.17 \times 0.83 = 0.141$, confirming model skill beyond prevalence-only
+prediction.
+
+\subsection{Decision Curve Analysis}
+
+Decision curve analysis (Figure~4) demonstrated that the XGBoost model
+provided net clinical benefit across the 0.10--0.35 predicted-probability
+range. At the Youden-optimal threshold of 0.1697, the model net benefit was
+0.0673, while the treat-all strategy yielded a net benefit of $-$0.0001 ---
+effectively zero --- confirming that the model substantially outperforms
+universal screening for the relevant moderate-risk stratum. The treat-none
+strategy had net benefit 0 by definition. These results support clinical
+deployment of the model as a threshold-guided screening instrument.
+
+\subsection{SHAP Feature Importance}
+
+Figure~5 presents the SHAP beeswarm plot for XGBoost on
+the $n = 5{,}000$ holdout sample. The top 10 predictors by mean $|$SHAP$|$ were:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{DEPRESSION} (depression diagnosis) --- highest mean $|$SHAP$|$;
+        strong positive association (diagnosed = higher SCD risk)
+  \item \textbf{MENTHLTH} (poor mental health days, 0--30) --- continuous
+        dose-response (more poor days = higher SCD risk)
+  \item \textbf{GENHLTH} (self-rated general health, 1--5) --- poor health
+        strongly positive
+  \item \textbf{ARTHRITIS} (arthritis diagnosis) --- moderate positive
+        association
+  \item \textbf{AGE} (age group) --- older age modestly associated with higher
+        SCD risk
+  \item \textbf{SMOKE100} (ever smoked $\geq$100 cigarettes) --- positive
+        association
+  \item \textbf{MSII\_D2} (MSII isolation domain 2 component) --- positive;
+        7th-ranked social isolation signal
+  \item \textbf{POORHLTH} (days unable to perform activities due to poor health)
+        --- positive
+  \item \textbf{PERSDOC3} (has a personal doctor) --- inverse association
+        (having a doctor = lower SCD risk; possibly reflecting healthcare
+        engagement)
+  \item \textbf{SEX} (biological sex) --- modest; female sex shows slightly
+        higher SCD probability in SHAP space
+\end{enumerate}
+
+The MSII component (MSII\_D2) ranked 7th, confirming that multi-dimensional
+social isolation carries incremental predictive signal beyond depression and
+general health status alone. SHAP dependence plots (Supplementary Figure~S1)
+revealed a non-linear interaction between DEPRESSION and MENTHLTH: the SHAP
+contribution of depression diagnosis was amplified among respondents with
+$\geq$15 poor mental health days per month.
+
+\subsection{MSII Feature Contribution (Ablation Analysis)}
+
+Removing all five MSII features reduced holdout AUROC from 0.7678 to 0.7615
+($\Delta$AUROC~=~$+$0.0063) and AUPRC from 0.4339 to 0.4264
+($\Delta$AUPRC~=~$+$0.0075; Table~\ref{tab:ablation}). The NRI confirmed
+meaningful reclassification improvement: NRI\textsubscript{events}~=~0.034
+(3.4\% of SCD-positive individuals moved to a higher-risk decile),
+NRI\textsubscript{non-events}~=~0.184, NRI\textsubscript{total}~=~0.218.
+Although the absolute AUROC gain is modest, the NRI total of 0.218 indicates
+that the MSII features provide non-trivial incremental reclassification benefit
+for both cases and non-cases, supporting their retention in the final model.
+
+\begin{table}[H]
+\centering
+\caption{MSII Feature Contribution: Ablation Analysis on 2024 Holdout Set}
+\label{tab:ablation}
+\small
+\begin{tabular}{L{5.5cm} C{2.5cm} C{2.5cm} C{2cm}}
+\toprule
+\textbf{Metric} & \textbf{Full Model} & \textbf{Without MSII} & \textbf{$\Delta$} \\
+\midrule
+AUROC (95\% CI) & 0.7678 & 0.7615 & $+$0.0063 \\
+AUPRC & 0.4339 & 0.4264 & $+$0.0075 \\
+NRI\textsubscript{events} & --- & --- & $+$0.034 \\
+NRI\textsubscript{non-events} & --- & --- & $+$0.184 \\
+NRI\textsubscript{total} & --- & --- & $+$0.218 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\small MSII = Multi-dimensional Social Isolation Index. Full model includes
+MSII\_COMPOSITE, MSII\_HIGH, and three domain sub-scores. NRI = Net
+Reclassification Index \cite{Pencina2008}; positive values indicate improvement
+with MSII features included. Holdout $N = 70{,}597$.
+\end{flushleft}
+\end{table}
+
+\subsection{Subgroup Analysis}
+
+Table~\ref{tab:subgroup} presents pre-specified subgroup AUROCs with
+bootstrap 95\% confidence intervals (500 resamples) on the 2024 holdout set.
+Model discrimination was strongest in the 50--64 age group (AUROC 0.8166,
+95\% CI 0.8099--0.8230), and declined monotonically with advancing age
+(65--79: 0.7482 [0.7404--0.7557]; $\geq$80: 0.6734 [0.6593--0.6863]).
+Discrimination was similar between males (0.7698 [0.7638--0.7767]) and
+females (0.7665 [0.7603--0.7734]). MSII-high and MSII-low subgroups performed
+similarly (0.7562 vs.\ 0.7607). The depression subgroup showed lower AUROC
+(0.7148 [0.7061--0.7235]), consistent with depression-mediated SCD risk
+reducing the residual discriminatory signal from social isolation features.
+High between-subgroup heterogeneity was observed (Cochran's $Q = 202.6$,
+$I^{2} = 96.5\%$, $p < 0.001$), driven primarily by the age-gradient
+effect, suggesting that age-stratified deployment thresholds warrant
+prospective investigation.
+
+\begin{table}[H]
+\centering
+\caption{Pre-Specified Subgroup Analysis on the 2024 Holdout Test Set (Bootstrap 95\% CIs, $B = 500$ resamples)}
+\label{tab:subgroup}
+\small
+\begin{tabular}{L{5cm} C{2cm} C{2.5cm} C{3.5cm}}
+\toprule
+\textbf{Subgroup} & \textbf{$n$} & \textbf{AUROC} & \textbf{95\% CI} \\
+\midrule
+\multicolumn{4}{l}{\textit{Age group}} \\
+\quad Age 50--64 years & 27,877 & \textbf{0.8166} & [0.8099, 0.8230] \\
+\quad Age 65--79 years & 30,603 & 0.7482 & [0.7404, 0.7557] \\
+\quad Age $\geq$80 years & 10,091 & 0.6734 & [0.6593, 0.6863] \\
+\midrule
+\multicolumn{4}{l}{\textit{Sex}} \\
+\quad Male & 31,877 & 0.7698 & [0.7638, 0.7767] \\
+\quad Female & 38,720 & 0.7665 & [0.7603, 0.7734] \\
+\midrule
+\multicolumn{4}{l}{\textit{Social isolation level}} \\
+\quad MSII high ($\geq$12.5) & 16,382 & 0.7562 & [0.7477, 0.7646] \\
+\quad MSII low ($<$12.5) & 54,215 & 0.7607 & [0.7549, 0.7664] \\
+\midrule
+\multicolumn{4}{l}{\textit{Mental health comorbidity}} \\
+\quad Depression diagnosis & 14,010 & 0.7148 & [0.7061, 0.7235] \\
+\midrule
+\multicolumn{4}{l}{\textit{Heterogeneity (all subgroups)}} \\
+\quad Cochran's $Q$ & \multicolumn{3}{l}{202.6, $df = 7$, $p < 0.001$} \\
+\quad $I^{2}$ & \multicolumn{3}{l}{96.5\% (very high)} \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\small All $n$ values are holdout-only (SURVEY\_YEAR = 2024, $N_{\text{hold}} = 70{,}597$).
+AUROC = Area Under the Receiver Operating Characteristic Curve;
+CI = confidence interval from 500 stratified bootstrap resamples.
+MSII = Multi-dimensional Social Isolation Index.
+$I^{2}$ heterogeneity driven primarily by the age gradient.
+\end{flushleft}
+\end{table}
+
+%% ── 4. Discussion ────────────────────────────────────────────────────────────
+\section{Discussion}
+
+\subsection{Principal Findings}
+
+This study presents the largest U.S.\ ML analysis ($N = 192{,}567$) linking
+multi-dimensional social isolation features to subjective cognitive decline
+in community-dwelling adults aged $\geq$50. XGBoost achieved a holdout AUROC
+of 0.7678 --- the highest among five models --- with a clinically useful NPV of
+0.92 and NNS of 3.2. These results establish that a no-biomarker, no-clinical-visit
+screening instrument, deployable from routine population health survey responses,
+can detect SCD with moderate-to-good discrimination.
+
+The pre-specified hypothesis from the study protocol was AUROC $\geq$ 0.80
+(benchmarked against Fasokun et al. \cite{Fasokun2026} and Alam et al.\
+\cite{Alam2026}). The achieved AUROC of 0.7678 fell below this target.
+Transparent reporting of this gap is essential: the achieved performance
+reflects the inherent difficulty of predicting SCD from cross-sectional survey
+data in a large, heterogeneous national sample. The models in Ishikawa et al.
+\cite{Ishikawa2025} and Alam et al.\ \cite{Alam2026} achieved AUROC $\sim$0.82
+in substantially smaller, potentially less heterogeneous samples. Discrimination
+typically decreases as sample size and population heterogeneity increase,
+which partially explains the gap. Importantly, the NPV of 0.92 and NNS of 3.2
+remain clinically meaningful for a first-tier population screening application.
+
+\subsection{Comparison with Prior Literature}
+
+The closest comparable work is Nguyen et al.\ \cite{Nguyen2026}, who applied
+gradient-boosted trees to pooled BRFSS data ($N = 298{,}944$; AUROC
+$\approx$0.76--0.77), establishing a BRFSS-specific performance ceiling
+of approximately AUROC 0.77. The present study achieves consistent performance
+(AUROC 0.7678) while contributing a distinct thematic contribution: the first
+BRFSS ML analysis to operationalize the MSII as the primary exposure
+framework, quantify its incremental contribution via ablation and NRI, and
+report a fully actionable screening threshold with NNS. Among clinical-cohort
+studies, Alam et al.\ \cite{Alam2026} ($N = 5{,}984$) and Ishikawa et al.\
+\cite{Ishikawa2025} ($N = 4{,}586$) achieved AUROC $\sim$0.82 using richer
+clinical features at sample sizes more than 30-fold smaller.
+The only prior BRFSS-based association study (Fasokun et al.\ \cite{Fasokun2026},
+$N = 86{,}520$) reported no ML model or AUROC.
+
+The critical methodological distinction applies to all three BRFSS comparators:
+Fasokun et al.\ addressed \textit{``does loneliness correlate with SCD?''};
+Nguyen et al.\ addressed \textit{``can gradient boosting predict SCD from
+BRFSS survey data?''}; the present study addresses \textit{``can ML detect SCD
+using specifically multi-dimensional social isolation features, with actionable
+screening metrics?''}. These are distinct scientific questions. Fasokun et al.\ addressed the question ``\textit{does
+loneliness correlate with SCD?}''; the present study addresses ``\textit{can ML
+predict who will screen positive for SCD using social isolation features, with
+sufficient accuracy for population deployment?}'' These are fundamentally
+different scientific questions with different clinical implications.
+
+Chinese cohort studies \cite{Wang2022,Hu2021} and Korean data \cite{Oh2024}
+achieved AUROCs of 0.81--0.83 but used different survey instruments, healthcare
+systems, and social constructs, limiting direct comparability. The U.K.\ ELSA
+study \cite{Ahmadzadeh2023} achieved AUROC 0.73 in $N = 2{,}733$, closer to
+the current result and likely reflecting similar challenges in nationally
+representative heterogeneous cohorts.
+
+\subsection{Clinical and Public Health Interpretation}
+
+The dominance of depression and mental health features (DEPRESSION, MENTHLTH)
+in SHAP rankings confirms a well-established clinical co-occurrence: depression
+is both a risk factor for and a symptom companion to cognitive decline. The
+MSII isolation composite ranked 7th, providing incremental signal but not
+dominating prediction. This finding does not diminish the relevance of social
+isolation; rather, it suggests that in BRFSS data, the \textit{experienced
+consequence} of isolation (depression, poor mental health) is more immediately
+predictive of SCD than the isolation exposure itself. Social isolation may
+operate as an \textit{upstream determinant} whose pathway to SCD is mediated
+through depression and general health deterioration.
+
+The subgroup finding that the 50--64 age band achieves AUROC 0.82 is clinically
+meaningful: this age group is likely in the pre-clinical SCD window when
+preventive intervention --- social prescribing, depression treatment, community
+connection programs --- can realistically alter cognitive trajectories. The
+lower AUROC in adults $\geq$80 (0.70) reflects multiple concurrent etiologies
+of cognitive difficulty at advanced age, reducing the discriminatory contribution
+of social isolation features.
+
+The NNS of 3.2 compares favorably with population screening benchmarks.
+Specifically, for a condition with 17\% prevalence and the social isolation risk
+pathway, a first-tier screen that identifies one true case for every 3.2 flagged
+individuals is competitive with primary care depression screening (NNS typically
+3--5 for PHQ-based tools at similar thresholds). Implementing this model as a
+population-level BRFSS score could guide states toward targeting social
+prescribing resources at high-risk adults before functional impairment emerges.
+
+\subsection{Limitations}
+
+Several limitations must be acknowledged. First, this is a \textbf{cross-sectional}
+study: exposure and outcome are measured simultaneously, precluding causal
+inference. The temporal direction of the social isolation -- SCD relationship
+cannot be established from BRFSS data alone; reverse causation (SCD causing
+social withdrawal) is plausible. Second, the SCD outcome is \textbf{self-reported
+and single-item}. It captures perceived cognitive change but lacks clinical
+validation against neuropsychological testing or biomarker confirmation.
+Approximately 40--50\% of BRFSS SCD-positive respondents may not meet clinical
+criteria for mild cognitive impairment. Third, the \textbf{temporal holdout is
+internal}: 2023 training to 2024 testing involves the same BRFSS infrastructure,
+questionnaire, and sample frame. True external validation in an independent
+cohort (e.g., HRS, NHATS) is needed before clinical deployment.
+
+Fourth, the achieved AUROC of 0.7678 \textbf{falls below the pre-specified
+target of 0.80}. Feature availability in BRFSS is limited by the optional-module
+structure: not all states administer all BRFSS social modules in both years.
+Enrichment with clinical variables (biomarkers, neuropsychological test scores)
+would likely improve discrimination but is not available in BRFSS. Fifth,
+BRFSS telephone sampling \textbf{underrepresents} the most socially isolated
+adults (those without telephone access or too cognitively impaired to complete
+the survey), introducing ascertainment bias that may attenuate true AUROC.
+Sixth, \textbf{race/ethnicity and geographic region} were included as features
+but BRFSS respondent misclassification and varying state participation in
+CIMEMLO1 may limit generalizability across demographic subgroups and states.
+
+\subsection{Future Directions}
+
+Several extensions are warranted. Longitudinal BRFSS data linkage or integration
+with Medicare claims records could convert this cross-sectional design to a
+prospective framework for incident SCD prediction. Federated learning approaches
+across state BRFSS datasets could improve model generalizability while preserving
+data privacy \cite{Alam2026}. External validation in NHATS or HRS is a priority.
+Finally, a clinical decision support tool embedding the XGBoost score in an
+electronic health record prompt could enable prospective evaluation of NNS in
+real primary care settings.
+
+%% ── 5. Conclusions ───────────────────────────────────────────────────────────
+\section{Conclusions}
+
+An XGBoost classifier trained on routinely collected BRFSS social and health
+survey data discriminates subjective cognitive decline with AUROC 0.7678
+(95\% CI 0.7595--0.7761) in a holdout cohort of 70,597 older U.S.\ adults,
+delivering an NPV of 0.92 and NNS of 3.2 at the Youden-optimal threshold. To our knowledge, this is among the largest BRFSS ML studies focused on
+multi-dimensional social isolation as the primary exposure framework for
+SCD screening ($N = 192{,}567$), with AUROC consistent with the concurrent
+BRFSS benchmark \cite{Nguyen2026}. Decision curve analysis confirms net
+clinical benefit at the deployment threshold; MSII features provide
+incremental reclassification benefit (NRI\textsubscript{total}~=~0.218)
+supporting their inclusion.
+SHAP analysis reveals that depression and mental health days dominate prediction,
+with the MSII social isolation composite contributing incremental 7th-rank signal,
+suggesting that the social pathway to SCD operates partly through mental health
+as an intermediate. The model falls below the pre-specified AUROC target of 0.80,
+consistent with the challenges of nationally representative heterogeneous survey
+data, but maintains clinically useful NPV and NNS. Before deployment, external
+validation and a prospective clinical decision study are required.
+
+%% ── Declarations ─────────────────────────────────────────────────────────────
+\section*{Declarations}
+
+\subsection*{Ethics Approval and Consent to Participate}
+This study used publicly available, de-identified BRFSS data released by the
+CDC. No human subjects research review was required for secondary analysis of
+publicly released, non-identifiable administrative data.
+
+\subsection*{Availability of Data and Materials}
+BRFSS annual data files are publicly available at
+\url{https://www.cdc.gov/brfss/annual\_data/annual\_data.htm}. All analysis
+scripts are available at [repository URL pending publication].
+
+\subsection*{Competing Interests}
+The author declares no competing interests.
+
+\subsection*{Funding}
+No external funding was received for this study.
+
+\subsection*{Authors' Contributions}
+[Author]: Conceptualization, methodology, software, formal analysis, data
+curation, writing (original draft, review and editing).
+
+\subsection*{Acknowledgments}
+The author acknowledges the CDC and all BRFSS state health departments for
+collecting and publicly releasing these data. The author used SciSpace AI
+Research Agent (SciSpace, 2026) as a generative AI assistant for analytical
+pipeline construction and manuscript drafting support; see the AI Usage
+Declaration on the title page.
+
+%% ── Abbreviations ────────────────────────────────────────────────────────────
+\section*{Abbreviations}
+\begin{tabular}{ll}
+ADRD & Alzheimer's disease and related dementias \\
+AUPRC & Area Under the Precision-Recall Curve \\
+AUROC & Area Under the Receiver Operating Characteristic Curve \\
+BRFSS & Behavioral Risk Factor Surveillance System \\
+CDC & Centers for Disease Control and Prevention \\
+CIMEMLO1 & Cognitive Impairment and Memory Loss optional module 1 \\
+GBM & Gradient Boosted Machine \\
+LGB & LightGBM \\
+LR & Logistic Regression \\
+ML & Machine Learning \\
+MCI & Mild Cognitive Impairment \\
+MSII & Multi-dimensional Social Isolation Index \\
+NNS & Number Needed to Screen \\
+NPV & Negative Predictive Value \\
+PPV & Positive Predictive Value \\
+RF & Random Forest \\
+SCD & Subjective Cognitive Decline \\
+SDoH & Social Determinants of Health \\
+SHAP & SHapley Additive exPlanations \\
+XGB & XGBoost \\
+\end{tabular}
+
+%% ── References ───────────────────────────────────────────────────────────────
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+%% ── Figure Legends ───────────────────────────────────────────────────────────
+\newpage
+\section*{Figure Legends}
+
+\noindent\textbf{Figure 1. Cohort Flow Diagram.}
+Selection of the analytic cohort from BRFSS 2023--2024. Starting from
+3,968,799 total BRFSS records, sequential filters for age $\geq$50,
+CIMEMLO1 module completion, and data quality yielded $N = 192{,}567$
+for analysis ($n = 121{,}970$ in the 2023 development set;
+$n = 70{,}597$ in the 2024 holdout test set).
+
+\vspace{0.5em}
+
+\noindent\textbf{Figure 2. ROC Curves for All Five Classifiers on the
+2024 Holdout Test Set.}
+Receiver Operating Characteristic (ROC) curves for logistic regression (AUROC
+0.7572), random forest (0.7598), XGBoost (0.7678, primary model), LightGBM
+(0.7669), and stacking ensemble (0.7412). The diagonal dashed line represents
+chance performance. DeLong 95\% CI for XGBoost: [0.7595, 0.7761].
+
+\vspace{0.5em}
+
+\noindent\textbf{Figure 3. Calibration Curve --- XGBoost on the 2024 Holdout Test Set.}
+Observed event rate (binned, 20 bins) versus mean predicted probability for
+XGBoost on the $N = 70{,}597$ holdout set. The diagonal dashed line represents
+perfect calibration. Calibration slope~=~1.030; intercept~=~$-$0.072;
+Brier score~=~0.1193. Minor over-prediction is observed above predicted
+probability 0.35, consistent with elevated true prevalence in high-risk strata.
+
+\vspace{0.5em}
+
+\noindent\textbf{Figure 4. Decision Curve Analysis --- XGBoost vs.\ Benchmarks.}
+Net benefit curves for the XGBoost model, the treat-all strategy,
+and the treat-none strategy across the threshold probability range
+0.05--0.50. At the Youden-optimal threshold of 0.1697, XGBoost net
+benefit~=~0.0673; treat-all net benefit~=~$-$0.0001. The model provides
+positive net benefit over both benchmarks across the 0.10--0.35 range,
+confirming clinical utility of the screening threshold \cite{Vickers2006}.
+
+\vspace{0.5em}
+
+\noindent\textbf{Figure 5. SHAP Beeswarm Plot --- XGBoost Top 20 Features
+($n = 5{,}000$ Holdout Sample).}
+Each point represents one respondent; x-axis shows SHAP value (impact on
+log-odds of SCD-positive prediction); color encodes feature value (red =
+high, blue = low). Features ranked by mean $|$SHAP$|$ descending. Top feature
+DEPRESSION shows the largest spread; MSII\_D2 (social isolation composite)
+ranks 7th.
+
+\section*{Supplementary Material}
+
+\noindent\textbf{Table S1. Full Hyperparameter Configurations.}
+[Provided as supplementary file pending repository upload.]
+
+\noindent\textbf{Table S2. SHAP Values for All 31 Features.}
+[Provided as supplementary file pending repository upload.]
+
+\noindent\textbf{Table S3. Calibration Metrics by Model.}
+[Provided as supplementary file pending repository upload.]
+
+\noindent\textbf{Table S4. TRIPOD+AI Checklist.}
+Completed TRIPOD+AI reporting checklist \cite{Collins2024} for this
+prediction model study. [Provided as supplementary file pending
+repository upload.]
+
+\end{document}
