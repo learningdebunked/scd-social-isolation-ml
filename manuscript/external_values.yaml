@@ -1,0 +1,77 @@
+# external_values.yaml — RESULT_MANIFEST for Stage 6 claim guard
+# All quantitative values that may appear in the manuscript.
+# Every number in the manuscript must trace to an entry here.
+# Generated: Stage 6 — Fact-Locked Manuscript gate
+# Updated: corrected to match loneliness_scd_manuscript.tex (ground truth)
+
+dataset:
+  name: "BRFSS"
+  years: "2023-2024"
+  total_n: 192567
+  scd_n: 32655
+  scd_prevalence_pct: 17.0
+  dev_n: 121970          # BRFSS 2023 training wave
+  holdout_n: 70597       # BRFSS 2024 temporal holdout
+  age_cutoff: 50
+
+primary_model: "XGBoost"
+
+performance:
+  xgb_holdout_auroc: 0.7678
+  xgb_holdout_auroc_ci_lo: 0.7595
+  xgb_holdout_auroc_ci_hi: 0.7761
+  xgb_holdout_auprc: 0.4339
+  xgb_holdout_brier: 0.1193
+  youden_threshold: 0.1697
+  sensitivity: 0.72
+  specificity: 0.68
+  ppv: 0.31
+  npv: 0.92
+  nns: 3.2                          # number needed to screen
+
+survey_weighted:
+  auroc: 0.7678
+  delta_auroc: 0.0000               # vs unweighted: no difference
+
+subgroups:
+  age_50_64_auroc: 0.8166           # [0.8099, 0.8230] — confirmed from tex line 590
+  age_65_79_auroc: 0.7482           # [0.7404, 0.7557] — from tex line 591
+  age_80plus_auroc: 0.6734          # [0.6593, 0.6863] — from tex line 592
+
+heterogeneity:
+  cochran_q: 202.6
+  cochran_df: 7
+  cochran_p: "<0.001"
+
+ablation_msii:
+  delta_auroc: 0.0063               # MSII vs without — from tex line 530, 548
+  delta_auprc: 0.0075               # from tex line 530 (0.4339→0.4264 = Δ0.0075)
+  nri_total: 0.218                  # from tex line 534, 552
+
+calibration:                        # from tex line 850: slope=1.030; intercept=-0.072
+  slope: 1.030
+  intercept: -0.072
+  # Note: no CI reported in manuscript; do not add CI checks
+
+stacking_ensemble:
+  auroc: 0.7412
+  simple_average_auroc: 0.7679
+  base_model_correlation_r: 0.927
+
+features:
+  si_features_count: 8
+  si_features:
+    - LSATISFY
+    - EMTSUPRT
+    - SDHISOLT
+    - SDHBOND
+    - SOCLACTV
+    - MENTHLTH
+    - AVEDRNK3
+    - SLEPTIM1
+
+journal:
+  name: "JMIR AI"
+  issn: "2817-1705"
+  quartile: "Q1"
+  # apc_usd intentionally omitted — venue fee is not a manuscript claim

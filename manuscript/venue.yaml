@@ -1,0 +1,72 @@
+# venue.yaml — JMIR AI author guidelines (verified 2024)
+# Source: https://ai.jmir.org/for-authors/instructions-for-authors
+
+journal:
+  name: "JMIR AI"
+  issn: "2817-1705"
+  publisher: "JMIR Publications"
+  quartile: "Q1"
+  indexing:
+    - "PubMed/MEDLINE"
+    - "PubMed Central"
+    - "Scopus"
+    - "DOAJ"
+    - "Web of Science (ESCI)"
+  access: "Gold Open Access"
+  apc_usd: 1985
+  scope: >
+    AI and machine learning applications in health and medicine,
+    clinical decision support, NLP in healthcare, explainable AI,
+    AI ethics in medicine, predictive modelling, digital health.
+
+submission:
+  article_type: "Original Article"
+  template: "JMIR standard (no journal-specific LaTeX template; DOCX preferred)"
+
+limits:
+  abstract:
+    max_words: 450
+    structure:
+      - Background
+      - Objective
+      - Methods
+      - Results
+      - Conclusions
+  body_text:
+    max_words: 7000          # original articles
+    note: "Word limit excludes abstract, references, tables, figures"
+  figures:
+    max_count: 8
+    format: "PNG or TIFF, ≥300 dpi, max 10 MB per file"
+    legends: "In manuscript body, not embedded in figure file"
+  tables:
+    max_count: 5
+    format: "Editable (not images); in manuscript body"
+  references:
+    style: "Vancouver (numbered)"
+    max_count: null           # no explicit cap stated
+  supplementary:
+    allowed: true
+    format: "PDF or DOCX; multimedia accepted"
+
+required_statements:
+  - "Ethics Approval and Consent to Participate"
+  - "Consent for Publication"
+  - "Availability of Data and Materials"
+  - "Competing Interests"
+  - "Funding"
+  - "Authors' Contributions (CRediT)"
+  - "Acknowledgments"
+  - "Generative AI Use Statement"
+
+reporting_guidelines:
+  - "TRIPOD (transparent reporting of multivariable prediction models)"
+  - "STROBE (observational studies, cross-sectional)"
+
+peer_review: "Double-blind"
+submission_system: "ScholarOne Manuscripts"
+submission_url: "https://ai.jmir.org/submissions"
+
+manuscript_figures_current: 5    # in manuscript (within cap of 8)
+manuscript_tables_current: 4     # in manuscript (within cap of 5)
+abstract_words_current: 354      # within cap of 450
